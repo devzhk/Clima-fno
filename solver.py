@@ -2,22 +2,13 @@
 # solve d/dt(q) + d/dx( D(q) d/dx(q) ) = f(x)
 # boundary conditions are periodic
 
+from tqdm import tqdm
 
-import scipy.io
-import scipy.ndimage
 import numpy as np
 from scipy.sparse.linalg import spsolve
 from scipy import sparse
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
-import torch
-import sys
 
-sys.path.append('../Utility')
-from Numerics import gradient_first_c2f, gradient_first_f2c, interpolate_f2c, gradient_first
-import NeuralNet
-
-from tqdm import tqdm
+from utils.numerics import gradient_first_c2f, gradient_first_f2c, interpolate_f2c, gradient_first
 
 #########################################
 # Neural network information
@@ -288,32 +279,28 @@ def nummodel_jac(permeability, q, yy, res, V, exact=False, D_permeability=None):
     return res, V
 
 
-def generate_data_helper(permeability, f_func, dt=5e-7, Nt=5_000_000, L=1.0, Nx=100):
+def generate_data_helper(permeability, f_func, dt=5e-6, Nt=1_000_000, L=1.0, Nx=100):
     xx = np.linspace(0.0, L, Nx)
     dy = xx[1] - xx[0]
     f = f_func(xx)
     dbc = np.array([0.0, 0.0])
 
     model = lambda q, yy, res: nummodel(permeability, q, yy, res)
-    xx, t_data, q_data = explicit_solve(model, f, dbc, dt=dt, Nt=Nt, save_every=1_000_000, L=L)
-
-    print("Last step increment is : ", np.linalg.norm(q_data[-1, :] - q_data[-2, :]), " last step is : ",
-          np.linalg.norm(q_data[-1, :]))
-
+    xx, t_data, q_data = explicit_solve(model, f, dbc, dt=dt, Nt=Nt, save_every=100_000, L=L)
+    last_step_inc = np.linalg.norm(q_data[-1, :] - q_data[-2, :])
+    last_step_norm = np.linalg.norm(q_data[-1, :])
+    print(f'Last step increment is {last_step_inc}; last step is : {last_step_norm}')
     q = q_data[-1, :]
     q_c, dq_c = interpolate_f2c(q), gradient_first_f2c(q, dy)
     return xx, f, q, q_c, dq_c
 
 
-def generate_data(n_data=10, Nx=100, start_idx=1):
-    f_funcs = []
-
-    for i in range(start_idx, n_data + start_idx):
-        def func(xx, A=i):
-            return A * xx
-
-        f_funcs.append(func)
-
+def generate_data(f_funcs, Nx=100):
+    '''
+    :param f_funcs: list of functions
+    :param Nx: resolution in x dimension
+    :return:
+    '''
     L = 1.0
     n_data = len(f_funcs)
     xx, f, q, q_c, dq_c = np.zeros((n_data, Nx)), np.zeros((n_data, Nx)), np.zeros((n_data, Nx)), np.zeros(
@@ -323,5 +310,4 @@ def generate_data(n_data=10, Nx=100, start_idx=1):
         # print(f'K: {i}')
         xx[i, :], f[i, :], q[i, :], q_c[i, :], dq_c[i, :] = generate_data_helper(permeability_ref, f_funcs[i], L=L,
                                                                                  Nx=Nx)
-
     return xx, f, q, q_c, dq_c

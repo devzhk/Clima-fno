@@ -1,3 +1,7 @@
+.vscode
+.idea
 exp
 data
 fig
+*/__pycache__/**
+__pycache__

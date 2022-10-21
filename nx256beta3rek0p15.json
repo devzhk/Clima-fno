@@ -1,0 +1,35 @@
+{
+  "input":
+  {
+    "nx": 256,
+    "L": 314.1592653589793238462643383279 ,
+    "dt": 2e-3,
+    "twrite": 1000.0,
+    "tmax": 2000,
+    "tavestart": 1000,
+    "taveint": 20,
+    "rek": 0.15,
+    "filterfac": 23.6,
+    "ntd": 32,
+    "beta": 3.0,
+    "rd": 1.0,
+    "delta": 1.0,
+    "H1": 1.0,
+    "U1": 0.0,
+    "U2": 0.0
+  },
+  "forcing":
+  {
+    "magnitude": 1.0   
+  },
+  "snapshot":
+  {
+    "tsnapstart": 0,
+    "tsnapint": 20
+  },
+  "output":
+  {
+    "output_dir": "exp/qg",
+    "exper_name": "nx256beta3rek0p15"
+  }
+}

@@ -1,0 +1,19 @@
+data:
+  datapath: data/poisson/train-s100.pickle
+  res: 100
+
+model:
+  layers: [8, 8, 8]
+  modes: [8, 8]
+  fc_dim: 8
+  act: tanh
+  closure: diffusivity
+
+train:
+  lr: 0.001
+  milestone: [1000, 2000, 3000]
+  warmup: 0
+  save_step: 1000
+
+log:
+  savedir: exp/poisson/default

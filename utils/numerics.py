@@ -1,8 +1,5 @@
 import numpy as np
 from scipy.fftpack import fft, ifft
-from scipy.sparse.linalg import spsolve
-from scipy import sparse
-
 
 # periodic boundary condition without end point
 # # extrapolate the gradient at the boundary
@@ -79,9 +76,8 @@ def interpolate_f2c(omega, bc="None"):
 # extrapolate the gradient at the boundary
 def interpolate_c2f(omega, bc="None"):
     nx = len(omega)
-
+    f_omega = np.zeros(nx)
     if bc == "periodic":
-        f_omega = np.zeros(nx)
         f_omega[1:nx] = (omega[1:nx] + omega[0:nx - 1]) / 2.0
         f_omega[0] = (omega[0] + omega[nx - 1]) / 2.0
     else:
