@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 from tqdm import tqdm
 import yaml
 
+from torch.optim import Adam
 import numpy as np
 
 from models.fno import FNO1d
